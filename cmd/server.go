@@ -75,6 +75,8 @@ func server(config *serverConfig) {
 	if quicConfig.MaxIncomingStreams == 0 {
 		quicConfig.MaxIncomingStreams = DefaultMaxIncomingStreams
 	}
+	// Transport
+	tr := transport.NewTransport(config.Transport.LocalTimeout, config.Transport.LocalMark, config.Transport.QUICMark)
 	// Auth
 	var authFunc func(addr net.Addr, auth []byte, sSend uint64, sRecv uint64) (bool, string)
 	var err error
@@ -128,7 +130,7 @@ func server(config *serverConfig) {
 	// ACL
 	var aclEngine *acl.Engine
 	if len(config.ACL) > 0 {
-		aclEngine, err = acl.LoadFromFile(config.ACL, transport.DefaultTransport)
+		aclEngine, err = acl.LoadFromFile(config.ACL, tr)
 		if err != nil {
 			logrus.WithFields(logrus.Fields{
 				"error": err,
@@ -147,7 +149,7 @@ func server(config *serverConfig) {
 			logrus.WithField("error", err).Fatal("Prometheus HTTP server error")
 		}()
 	}
-	server, err := core.NewServer(config.Listen, tlsConfig, quicConfig, transport.DefaultTransport,
+	server, err := core.NewServer(config.Listen, tlsConfig, quicConfig, tr,
 		uint64(config.UpMbps)*mbpsToBps, uint64(config.DownMbps)*mbpsToBps,
 		func(refBPS uint64) congestion.CongestionControl {
 			return hyCongestion.NewBrutalSender(congestion.ByteCount(refBPS))

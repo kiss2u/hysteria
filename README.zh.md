@@ -165,7 +165,12 @@ Hysteria 是一个功能丰富的，专为恶劣网络环境进行优化的网�
   "recv_window_conn": 15728640, // QUIC stream receive window
   "recv_window_client": 67108864, // QUIC connection receive window
   "max_conn_client": 4096, // 单客户端最大活跃连接数
-  "disable_mtu_discovery": false // 禁用 MTU 探测 (RFC 8899)
+  "disable_mtu_discovery": false, // 禁用 MTU 探测 (RFC 8899)
+  "transport": {
+    "local_timeout": 8, // 本地连接超时，秒
+    "local_mark": 255, // 本地连接 mark (主要在 TPROXY 模式下有用)
+    "quic_mark": 254 // QUIC 连接 mark (主要在 TPROXY 模式下有用)
+  }
 }
 ```
 
@@ -287,7 +292,12 @@ hysteria_traffic_uplink_bytes_total{auth="aGFja2VyISE="} 37452
   "ca": "my.ca", // 自定义 CA
   "recv_window_conn": 15728640, // QUIC stream receive window
   "recv_window": 67108864, // QUIC connection receive window
-  "disable_mtu_discovery": false // 禁用 MTU 探测 (RFC 8899)
+  "disable_mtu_discovery": false, // 禁用 MTU 探测 (RFC 8899)
+  "transport": {
+    "local_timeout": 8, // 本地连接超时，秒
+    "local_mark": 255, // 本地连接 mark (主要在 TPROXY 模式下有用)
+    "quic_mark": 254 // QUIC 连接 mark (主要在 TPROXY 模式下有用)
+  }
 }
 ```
 

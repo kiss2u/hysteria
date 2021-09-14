@@ -16,6 +16,19 @@ const (
 	tlsProtocolName = "hysteria"
 )
 
+type transportConfig struct {
+	LocalTimeout int    `json:"local_timeout"`
+	LocalMark    uint32 `json:"local_mark"`
+	QUICMark     uint32 `json:"quic_mark"`
+}
+
+func (c *transportConfig) Check() error {
+	if c.LocalTimeout < 0 {
+		return errors.New("invalid local timeout")
+	}
+	return nil
+}
+
 type serverConfig struct {
 	Listen string `json:"listen"`
 	ACME   struct {
@@ -38,11 +51,12 @@ type serverConfig struct {
 		Mode   string           `json:"mode"`
 		Config json5.RawMessage `json:"config"`
 	} `json:"auth"`
-	PrometheusListen    string `json:"prometheus_listen"`
-	ReceiveWindowConn   uint64 `json:"recv_window_conn"`
-	ReceiveWindowClient uint64 `json:"recv_window_client"`
-	MaxConnClient       int    `json:"max_conn_client"`
-	DisableMTUDiscovery bool   `json:"disable_mtu_discovery"`
+	PrometheusListen    string          `json:"prometheus_listen"`
+	ReceiveWindowConn   uint64          `json:"recv_window_conn"`
+	ReceiveWindowClient uint64          `json:"recv_window_client"`
+	MaxConnClient       int             `json:"max_conn_client"`
+	DisableMTUDiscovery bool            `json:"disable_mtu_discovery"`
+	Transport           transportConfig `json:"transport"`
 }
 
 func (c *serverConfig) Check() error {
@@ -61,6 +75,9 @@ func (c *serverConfig) Check() error {
 	}
 	if c.MaxConnClient < 0 {
 		return errors.New("invalid max connections per client")
+	}
+	if err := c.Transport.Check(); err != nil {
+		return err
 	}
 	return nil
 }
@@ -116,16 +133,17 @@ type clientConfig struct {
 		Listen  string `json:"listen"`
 		Timeout int    `json:"timeout"`
 	} `json:"tproxy_udp"`
-	ACL                 string `json:"acl"`
-	Obfs                string `json:"obfs"`
-	Auth                []byte `json:"auth"`
-	AuthString          string `json:"auth_str"`
-	ServerName          string `json:"server_name"`
-	Insecure            bool   `json:"insecure"`
-	CustomCA            string `json:"ca"`
-	ReceiveWindowConn   uint64 `json:"recv_window_conn"`
-	ReceiveWindow       uint64 `json:"recv_window"`
-	DisableMTUDiscovery bool   `json:"disable_mtu_discovery"`
+	ACL                 string          `json:"acl"`
+	Obfs                string          `json:"obfs"`
+	Auth                []byte          `json:"auth"`
+	AuthString          string          `json:"auth_str"`
+	ServerName          string          `json:"server_name"`
+	Insecure            bool            `json:"insecure"`
+	CustomCA            string          `json:"ca"`
+	ReceiveWindowConn   uint64          `json:"recv_window_conn"`
+	ReceiveWindow       uint64          `json:"recv_window"`
+	DisableMTUDiscovery bool            `json:"disable_mtu_discovery"`
+	Transport           transportConfig `json:"transport"`
 }
 
 func (c *clientConfig) Check() error {
@@ -170,6 +188,9 @@ func (c *clientConfig) Check() error {
 	if (c.ReceiveWindowConn != 0 && c.ReceiveWindowConn < 65536) ||
 		(c.ReceiveWindow != 0 && c.ReceiveWindow < 65536) {
 		return errors.New("invalid receive window size")
+	}
+	if err := c.Transport.Check(); err != nil {
+		return err
 	}
 	return nil
 }

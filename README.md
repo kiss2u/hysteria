@@ -179,7 +179,12 @@ encryption. If you need a proxy, just use our proxy modes.
   "recv_window_conn": 15728640, // QUIC stream receive window
   "recv_window_client": 67108864, // QUIC connection receive window
   "max_conn_client": 4096, // Max concurrent connections per client
-  "disable_mtu_discovery": false // Disable Path MTU Discovery (RFC 8899)
+  "disable_mtu_discovery": false, // Disable Path MTU Discovery (RFC 8899)
+  "transport": {
+    "local_timeout": 8, // Local connection timeout in seconds
+    "local_mark": 255, // Local connection mark (useful for TPROXY)
+    "quic_mark": 254 // QUIC connection mark (useful for TPROXY)
+  }
 }
 ```
 
@@ -302,7 +307,12 @@ hysteria_traffic_uplink_bytes_total{auth="aGFja2VyISE="} 37452
   "ca": "my.ca", // Custom CA file
   "recv_window_conn": 15728640, // QUIC stream receive window
   "recv_window": 67108864, // QUIC connection receive window
-  "disable_mtu_discovery": false // Disable Path MTU Discovery (RFC 8899)
+  "disable_mtu_discovery": false, // Disable Path MTU Discovery (RFC 8899)
+  "transport": {
+    "local_timeout": 8, // Local connection timeout in seconds
+    "local_mark": 255, // Local connection mark (useful for TPROXY)
+    "quic_mark": 254 // QUIC connection mark (useful for TPROXY)
+  }
 }
 ```
 
